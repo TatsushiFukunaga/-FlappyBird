@@ -31,6 +31,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var bestScoreLabelNode:SKLabelNode!
     let userDefaults:UserDefaults = UserDefaults.standard
     
+    //効果音
+    let sound = SKAction.playSoundFileNamed("itemgetsea.mp3", waitForCompletion: true)
+    
+    
     // SKView上にシーンが表示されたときに呼ばれるメソッド
     override func didMove(to view: SKView) {
         
@@ -301,6 +305,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // SKPhysicsContactDelegateのメソッド。衝突したときに呼ばれる
     func didBegin(_ contact: SKPhysicsContact) {
         
+     
         // ゲームオーバーのときは何もしない
         if scrollNode.speed <= 0 {
             return
@@ -328,7 +333,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             print("ItemScoreUp")
             itemScore += 1
             itemScoreLabelNode.text = "Item Score:\(itemScore)"
-          
+           
+            self.run(sound)
+            
+            
         } else {
             // 壁か地面と衝突した
             print("GameOver")
