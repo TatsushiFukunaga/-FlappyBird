@@ -15,7 +15,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var wallNode:SKNode!
     var bird:SKSpriteNode!
     var coin:SKNode!
-    
     // 衝突判定カテゴリー
     let birdCategory: UInt32 = 1 << 0       // 0...00001
     let groundCategory: UInt32 = 1 << 1     // 0...00010
@@ -35,6 +34,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let sound = SKAction.playSoundFileNamed("itemgetsea.mp3", waitForCompletion: true)
     
     
+    
     // SKView上にシーンが表示されたときに呼ばれるメソッド
     override func didMove(to view: SKView) {
         
@@ -52,7 +52,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         wallNode = SKNode()
         scrollNode.addChild(wallNode)
         
-       
+        
         
         // 各種スプライトを生成する処理をメソッドに分割
         setupGround()
@@ -240,7 +240,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             coin.physicsBody?.isDynamic = false
             coin.physicsBody?.categoryBitMask = self.itemScoreCategory
             coin.physicsBody?.contactTestBitMask = self.birdCategory
-            
+ 
             wall.addChild(coin)
             
            
@@ -253,6 +253,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             scoreNode.physicsBody?.contactTestBitMask = self.birdCategory
 
             wall.addChild(scoreNode)
+            
             
 
             wall.run(wallAnimation)
@@ -302,10 +303,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(bird)
     }
     
+  
+    
     // SKPhysicsContactDelegateのメソッド。衝突したときに呼ばれる
     func didBegin(_ contact: SKPhysicsContact) {
         
-     
+        
         // ゲームオーバーのときは何もしない
         if scrollNode.speed <= 0 {
             return
@@ -328,19 +331,39 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             
         } else if (contact.bodyA.categoryBitMask &
-            itemScoreCategory) == itemScoreCategory || (contact.bodyB.categoryBitMask & itemScoreCategory) == itemScoreCategory {
+            itemScoreCategory) == itemScoreCategory {
             
             print("ItemScoreUp")
             itemScore += 1
             itemScoreLabelNode.text = "Item Score:\(itemScore)"
-           
+            
             self.run(sound)
             
+            let item = contact.bodyA.node
+            item?.removeFromParent()
+            print("Get Item")
             
+            
+            
+            
+          
+        } else if (contact.bodyB.categoryBitMask & itemScoreCategory) == itemScoreCategory {
+            
+            print("ItemScoreUp")
+            itemScore += 1
+            itemScoreLabelNode.text = "Item Score:\(itemScore)"
+            
+            self.run(sound)
+            
+            let item = contact.bodyB.node
+            item?.removeFromParent()
+            print("Get Item")
+            
+            
+          
         } else {
             // 壁か地面と衝突した
             print("GameOver")
-
             // スクロールを停止させる
             scrollNode.speed = 0
 
@@ -352,6 +375,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             })
         }
     }
+    
     
     func restart() {
         score = 0
